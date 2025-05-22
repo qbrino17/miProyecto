@@ -1,0 +1,568 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Panel de Alejandro Miertaño | VentasPro</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet" />
+  <style>
+    :root {
+      --primary-color: #5e35b1;
+      --secondary-color: #3949ab;
+      --accent-color: #7c4dff;
+      --light-color: #f5f3ff;
+      --dark-color: #1a237e;
+      --sidebar-width: 260px;
+    }
+
+    .logout-btn {
+      background-color: var(--accent-color);
+      border: none;
+      color: white;
+      font-weight: 600;
+      padding: 8px 16px;
+      border-radius: 4px;
+      cursor: pointer;
+      margin-left: 20px;
+      transition: background-color 0.3s ease;
+    }
+
+    .logout-btn:hover {
+      background-color: var(--primary-color);
+    }
+
+
+    body {
+      background-color: var(--light-color);
+      font-family: 'Segoe UI', sans-serif;
+      margin: 0;
+      padding: 0;
+    }
+
+    .sidebar {
+      width: var(--sidebar-width);
+      height: 100vh;
+      position: fixed;
+      top: 0;
+      left: 0;
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem 1rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-start;
+    }
+
+    .sidebar h4 {
+      margin-bottom: 2rem;
+      user-select: none;
+    }
+
+    .sidebar a {
+      display: block;
+      color: white;
+      padding: 0.6rem 0;
+      text-decoration: none;
+      border-radius: 5px;
+      cursor: pointer;
+      user-select: none;
+      font-weight: 500;
+      transition: background-color 0.3s ease;
+    }
+
+    .sidebar a.active, .sidebar a:hover {
+      background-color: var(--accent-color);
+    }
+
+    .btn-compose {
+      background-color: var(--accent-color);
+      color: white;
+      font-weight: bold;
+      width: 100%;
+      margin-bottom: 2rem;
+      border: none;
+      cursor: pointer;
+      font-size: 1.1rem;
+      user-select: none;
+      border-radius: 6px;
+      padding: 0.6rem 0;
+      transition: background-color 0.3s ease;
+    }
+
+    .btn-compose:hover {
+      background-color: var(--secondary-color);
+    }
+
+    .main {
+      margin-left: var(--sidebar-width);
+      padding: 2rem;
+    }
+
+    .header {
+      background-color: white;
+      padding: 1.5rem;
+      border-radius: 12px;
+      display: flex;
+      align-items: center;
+      box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+      margin-bottom: 1.5rem;
+      user-select: none;
+    }
+
+    .avatar {
+      width: 90px;
+      height: 90px;
+      border-radius: 50%;
+      background-color: var(--accent-color);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 2.4rem;
+      font-weight: bold;
+      color: white;
+      margin-right: 1.5rem;
+      flex-shrink: 0;
+    }
+
+    .info h3 {
+      margin-bottom: 5px;
+    }
+
+    .info small {
+      color: gray;
+    }
+
+    .inbox {
+      margin-top: 1rem;
+    }
+
+    .mail-card {
+      background-color: white;
+      border-radius: 8px;
+      padding: 1rem 1.5rem;
+      margin-bottom: 1rem;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      user-select: none;
+    }
+
+    .mail-card:hover {
+      background-color: #f2efff;
+    }
+
+    .mail-subject {
+      font-weight: bold;
+      color: var(--dark-color);
+      margin-bottom: 0.3rem;
+    }
+
+    .mail-preview {
+      color: #555;
+      font-size: 0.9rem;
+    }
+
+    /* Modal styles */
+    .modal-backdrop {
+      position: fixed;
+      inset: 0;
+      background-color: rgba(0,0,0,0.5);
+      display: none;
+      justify-content: center;
+      align-items: center;
+      z-index: 1050;
+    }
+
+    .modal-backdrop.active {
+      display: flex;
+    }
+
+    .modal-content-custom {
+      background-color: white;
+      border-radius: 12px;
+      padding: 2rem;
+      max-width: 500px;
+      width: 90%;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+      position: relative;
+      animation: fadeInScale 0.3s ease forwards;
+    }
+
+    @keyframes fadeInScale {
+      0% {opacity: 0; transform: scale(0.8);}
+      100% {opacity: 1; transform: scale(1);}
+    }
+
+    .modal-header {
+      font-weight: bold;
+      font-size: 1.25rem;
+      margin-bottom: 1rem;
+      color: var(--primary-color);
+      user-select: none;
+    }
+
+    .modal-close {
+      position: absolute;
+      top: 10px;
+      right: 15px;
+      font-size: 1.4rem;
+      cursor: pointer;
+      color: var(--secondary-color);
+      border: none;
+      background: transparent;
+      user-select: none;
+    }
+
+    textarea {
+      resize: vertical;
+    }
+
+    @media (max-width: 768px) {
+      .sidebar {
+        position: relative;
+        width: 100%;
+        height: auto;
+        flex-direction: row;
+        overflow-x: auto;
+      }
+
+      .sidebar h4 {
+        margin-right: 2rem;
+      }
+
+      .btn-compose {
+        flex: none;
+        width: auto;
+        margin-bottom: 0;
+        margin-right: 1rem;
+        padding: 0.4rem 1rem;
+        font-size: 1rem;
+      }
+
+      .sidebar a {
+        flex: none;
+        margin-right: 1rem;
+        padding: 0.4rem 1rem;
+      }
+
+      .main {
+        margin-left: 0;
+        padding: 1rem;
+      }
+
+      .header {
+        flex-direction: column;
+        text-align: center;
+      }
+
+      .avatar {
+        margin-bottom: 1rem;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Sidebar tipo correo -->
+  <div class="sidebar">
+    <h4><i class="fas fa-cash-register me-2"></i>VentaPro</h4>
+    <button class="btn-compose" id="btnCompose">+ Redactar</button>
+    <a href="#" data-folder="inbox" class="active">Bandeja de entrada</a>
+    <a href="#" data-folder="sent">Enviados</a>
+    <a href="#" data-folder="important">Importantes</a>
+    <a href="#" data-folder="archived">Archivados</a>
+    <a href="#">Configuración</a>
+  </div>
+
+  <!-- Área principal -->
+  <div class="main">
+    <!-- Header perfil -->
+    <div class="header" style="position: relative;">
+      <div class="avatar">A</div>
+      <div class="info">
+        <h3 style="font-weight: 800; font-size: 1.8rem; font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif; color: var(--dark-color); margin: 0;">
+          Alejandro Miertaño
+        </h3>
+        <small>Administrador del sistema de ventas - VentasPro</small><br />
+        <small>alejandro.miertano@ventaspro.com | Arequipa, Perú</small>
+      </div>
+      <a href="{{ url_for('menu') }}" class="logout-btn"
+         style="
+           position: absolute;
+           top: 10px;
+           right: 10px;
+           padding: 10px 20px;
+           font-weight: 700;
+           font-size: 1.1rem;
+           background-color: var(--accent-color);
+           color: white;
+           border-radius: 6px;
+           text-decoration: none;
+           cursor: pointer;
+           display: inline-block;
+           transition: background-color 0.3s ease, transform 0.2s ease;
+         "
+         onmouseover="this.style.transform='scale(1.05)'; this.style.backgroundColor='var(--primary-color)';"
+         onmouseout="this.style.transform='scale(1)'; this.style.backgroundColor='var(--accent-color)';"
+      >
+        Salir
+      </a>
+    </div>
+
+
+    <!-- Inbox simulada -->
+    <div class="inbox" id="inboxList">
+      <!-- Items creados dinámicamente -->
+    </div>
+  </div>
+
+  <!-- Modal para lectura de correo -->
+  <div class="modal-backdrop" id="modalRead">
+    <div class="modal-content-custom">
+      <button class="modal-close" id="closeRead">&times;</button>
+      <div class="modal-header" id="modalReadSubject">Asunto</div>
+      <div id="modalReadBody">Contenido del correo...</div>
+    </div>
+  </div>
+
+  <!-- Modal para redactar correo -->
+  <div class="modal-backdrop" id="modalCompose">
+    <div class="modal-content-custom">
+      <button class="modal-close" id="closeCompose">&times;</button>
+      <div class="modal-header">Redactar nuevo mensaje</div>
+      <form id="composeForm">
+        <div class="mb-3">
+          <label for="toEmail" class="form-label">Para:</label>
+          <input type="email" class="form-control" id="toEmail" placeholder="correo@ejemplo.com" required />
+        </div>
+        <div class="mb-3">
+          <label for="subjectEmail" class="form-label">Asunto:</label>
+          <input type="text" class="form-control" id="subjectEmail" placeholder="Asunto del correo" required />
+        </div>
+        <div class="mb-3">
+          <label for="bodyEmail" class="form-label">Mensaje:</label>
+          <textarea class="form-control" id="bodyEmail" rows="5" placeholder="Escribe tu mensaje aquí..." required></textarea>
+        </div>
+        <button type="submit" class="btn btn-compose w-100">Enviar</button>
+      </form>
+    </div>
+  </div>
+
+  <script>
+    const emails = [
+      // Inbox
+      {
+        subject: "📊 Nuevo reporte mensual disponible",
+        preview: "Se generó el reporte de ventas de abril. Total: S/ 42,000. Revisa los indicadores clave...",
+        body: "Estimado Alejandro,\n\nEl reporte mensual de ventas de abril ya está disponible en el sistema VentasPro. Puedes revisarlo en la sección de reportes.\n\nTotal de ventas: S/ 42,000.\n\nSaludos,\nEquipo VentasPro",
+        folder: "inbox"
+      },
+      {
+        subject: "👥 Nuevos usuarios registrados en VentasPro",
+        preview: "4 nuevos vendedores fueron añadidos al sistema hoy a las 9:12 AM.",
+        body: "Hola Alejandro,\n\nHoy se registraron 4 nuevos vendedores en VentasPro. Por favor, verifica que sus roles y permisos estén configurados correctamente.\n\nSaludos,\nEquipo VentasPro",
+        folder: "inbox"
+      },
+      {
+        subject: "⚙️ Backup automático completado",
+        preview: "La copia de seguridad del sistema se completó con éxito el 18 de mayo a las 23:58.",
+        body: "Hola Alejandro,\n\nLa copia de seguridad automática se realizó correctamente sin errores el 18 de mayo a las 23:58.\n\nPuedes revisar el historial en el panel de administración.\n\nSaludos,\nEquipo VentasPro",
+        folder: "inbox"
+      },
+      {
+        subject: "🔔 Recordatorio: Reunión de equipo mañana",
+        preview: "No olvides la reunión de seguimiento de ventas mañana a las 10 AM.",
+        body: "Hola Alejandro,\n\nEste es un recordatorio de la reunión de equipo programada para mañana a las 10:00 AM.\n\nLugar: Sala de conferencias 3.\n\nSaludos,\nEquipo VentasPro",
+        folder: "inbox"
+      },
+      {
+        subject: "📢 Actualización de políticas internas",
+        preview: "Se actualizaron las políticas de vacaciones y permisos. Revisa el documento adjunto.",
+        body: "Estimado Alejandro,\n\nHemos actualizado las políticas internas relacionadas a vacaciones y permisos. Por favor revisa el documento adjunto en el sistema.\n\nSaludos,\nRecursos Humanos",
+        folder: "inbox"
+      },
+      {
+        subject: "🚨 Alerta de seguridad: acceso sospechoso detectado",
+        preview: "Se detectó un acceso desde una ubicación desconocida el 17 de mayo.",
+        body: "Hola Alejandro,\n\nSe ha detectado un intento de acceso desde una ubicación no reconocida el 17 de mayo a las 23:45. Recomendamos cambiar tu contraseña inmediatamente.\n\nSaludos,\nEquipo de Seguridad",
+        folder: "inbox"
+      },
+
+      // Sent
+      {
+        subject: "Para: juan.perez@ventaspro.com | Actualización de permisos",
+        preview: "Hola Juan, tus permisos de administrador fueron actualizados correctamente.",
+        body: "Mensaje enviado a juan.perez@ventaspro.com:\n\nHola Juan,\n\nTus permisos de administrador en VentasPro han sido actualizados como solicitaste.\n\nSaludos,\nAlejandro",
+        folder: "sent"
+      },
+      {
+        subject: "Para: soporte@ventaspro.com | Problema con la conexión",
+        preview: "Hola equipo, reporto un problema de conexión intermitente desde ayer.",
+        body: "Mensaje enviado a soporte@ventaspro.com:\n\nHola equipo,\n\nHe detectado problemas intermitentes de conexión en VentasPro desde ayer. Por favor, investiguen y me avisan.\n\nGracias,\nAlejandro",
+        folder: "sent"
+      },
+      {
+        subject: "Para: clientes@ventaspro.com | Invitación webinar ventas",
+        preview: "Invitamos a todos los clientes a un webinar exclusivo sobre nuevas técnicas de ventas.",
+        body: "Mensaje enviado a clientes@ventaspro.com:\n\nEstimados clientes,\n\nLos invitamos a participar en nuestro webinar exclusivo sobre nuevas técnicas de ventas que realizaremos el próximo jueves.\n\nSaludos,\nAlejandro",
+        folder: "sent"
+      },
+      {
+        subject: "Para: equipo@ventaspro.com | Resumen semanal",
+        preview: "Les envío el resumen de actividades y objetivos para esta semana.",
+        body: "Mensaje enviado a equipo@ventaspro.com:\n\nEquipo,\n\nAdjunto el resumen de actividades realizadas y objetivos para esta semana.\n\nSaludos,\nAlejandro",
+        folder: "sent"
+      },
+
+      // Important
+      {
+        subject: "⭐ Revisión urgente del sistema",
+        preview: "Alejandro, por favor revisa los logs de errores críticos reportados esta madrugada.",
+        body: "Hola Alejandro,\n\nSe reportaron varios errores críticos en el sistema esta madrugada. Necesitamos una revisión urgente para evitar problemas mayores.\n\nSaludos,\nEquipo VentasPro",
+        folder: "important"
+      },
+      {
+        subject: "⭐ Backup fuera de horario",
+        preview: "Se programó un backup adicional para esta noche a las 2 AM.",
+        body: "Estimado Alejandro,\n\nSe ha programado un backup fuera del horario normal para esta noche a las 2 AM para mayor seguridad.\n\nSaludos,\nEquipo VentasPro",
+        folder: "important"
+      },
+      {
+        subject: "⭐ Nueva versión del sistema disponible",
+        preview: "La versión 3.2.1 incluye mejoras de seguridad y rendimiento. Programa actualización.",
+        body: "Hola Alejandro,\n\nYa está disponible la versión 3.2.1 de VentasPro. Incluye varias mejoras de seguridad y rendimiento. Recomendamos programar la actualización esta semana.\n\nSaludos,\nEquipo de Desarrollo",
+        folder: "important"
+      },
+
+      // Archived
+      {
+        subject: "📁 Proyecto antiguo archivado",
+        preview: "El proyecto de integración con sistema viejo fue archivado correctamente.",
+        body: "Hola Alejandro,\n\nEl proyecto de integración con el sistema antiguo ha sido archivado. Ya no aparecerá en la lista principal.\n\nSaludos,\nEquipo VentasPro",
+        folder: "archived"
+      },
+      {
+        subject: "📁 Informe de ventas 2022 archivado",
+        preview: "El informe completo de ventas del año 2022 se archivó para referencia futura.",
+        body: "Estimado Alejandro,\n\nEl informe completo de ventas correspondiente al año 2022 fue archivado. Puedes acceder a él desde la sección de archivos.\n\nSaludos,\nEquipo VentasPro",
+        folder: "archived"
+      },
+      {
+        subject: "📁 Email antiguo de soporte archivado",
+        preview: "Conversación con soporte sobre problemas técnicos del año pasado archivada.",
+        body: "Hola Alejandro,\n\nSe archivó la conversación con soporte sobre problemas técnicos registrados el año pasado.\n\nSaludos,\nEquipo VentasPro",
+        folder: "archived"
+      }
+    ];
+
+    let currentFolder = "inbox";
+
+    const inboxList = document.getElementById('inboxList');
+    const modalRead = document.getElementById('modalRead');
+    const modalReadSubject = document.getElementById('modalReadSubject');
+    const modalReadBody = document.getElementById('modalReadBody');
+    const closeRead = document.getElementById('closeRead');
+    const btnCompose = document.getElementById('btnCompose');
+    const modalCompose = document.getElementById('modalCompose');
+    const closeCompose = document.getElementById('closeCompose');
+    const composeForm = document.getElementById('composeForm');
+
+    // Render emails filtrando por folder actual
+    function renderInbox() {
+      inboxList.innerHTML = '';
+      const filtered = emails.filter(email => email.folder === currentFolder);
+
+      if(filtered.length === 0){
+        inboxList.innerHTML = `<p style="color:#555; user-select:none;">No hay correos en esta carpeta.</p>`;
+        return;
+      }
+
+      filtered.forEach((email, index) => {
+        const mailCard = document.createElement('div');
+        mailCard.classList.add('mail-card');
+        mailCard.innerHTML = `
+          <div class="mail-subject">${email.subject}</div>
+          <div class="mail-preview">${email.preview}</div>
+        `;
+        mailCard.addEventListener('click', () => {
+          openReadModal(index);
+        });
+        inboxList.appendChild(mailCard);
+      });
+    }
+
+    // Abrir modal lectura mostrando correo correcto
+    function openReadModal(index) {
+      // Solo mostrar correos del folder actual, ajustar index
+      const filtered = emails.filter(email => email.folder === currentFolder);
+      const email = filtered[index];
+      if (!email) return;
+      modalReadSubject.textContent = email.subject;
+      modalReadBody.innerHTML = email.body.replace(/\n/g, '<br>');
+      modalRead.classList.add('active');
+    }
+
+    closeRead.addEventListener('click', () => {
+      modalRead.classList.remove('active');
+    });
+
+    // Abrir modal redactar
+    btnCompose.addEventListener('click', () => {
+      composeForm.reset();
+      modalCompose.classList.add('active');
+    });
+
+    closeCompose.addEventListener('click', () => {
+      modalCompose.classList.remove('active');
+    });
+
+    // Enviar mensaje simulado
+    composeForm.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const to = document.getElementById('toEmail').value.trim();
+      const subject = document.getElementById('subjectEmail').value.trim();
+      const body = document.getElementById('bodyEmail').value.trim();
+
+      if (to && subject && body) {
+        emails.unshift({
+          subject: `Para: ${to} | ${subject}`,
+          preview: body.length > 60 ? body.substring(0, 57) + '...' : body,
+          body: `Mensaje enviado a ${to}:\n\n${body}`,
+          folder: 'sent'
+        });
+        currentFolder = 'sent';
+        updateSidebarActive();
+        renderInbox();
+        modalCompose.classList.remove('active');
+        alert('Correo enviado con éxito!');
+      }
+    });
+
+    // Cambiar carpeta al hacer click en sidebar
+    const sidebarLinks = document.querySelectorAll('.sidebar a[data-folder]');
+    sidebarLinks.forEach(link => {
+      link.addEventListener('click', (e) => {
+        e.preventDefault();
+        currentFolder = link.getAttribute('data-folder');
+        updateSidebarActive();
+        renderInbox();
+      });
+    });
+
+    // Actualiza la clase active en sidebar
+    function updateSidebarActive() {
+      sidebarLinks.forEach(link => {
+        link.classList.remove('active');
+        if(link.getAttribute('data-folder') === currentFolder){
+          link.classList.add('active');
+        }
+      });
+    }
+
+    // Inicializar
+    updateSidebarActive();
+    renderInbox();
+  </script>
+
+</body>
+</html>

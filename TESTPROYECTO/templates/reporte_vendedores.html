@@ -1,0 +1,528 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <title>Reporte de Vendedores</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+
+  <!-- Bootstrap 5 -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <!-- Bootstrap Icons -->
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+  <!-- jsPDF y autoTable -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf-autotable/3.5.28/jspdf.plugin.autotable.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+
+  <style>
+
+    
+
+
+    :root {
+      --primary-color: #2c3e50;
+      --secondary-color: #34495e;
+      --accent-color: #3498db;
+      --light-color: #ecf0f1;
+      --dark-color: #2c3e50;
+    }
+    
+    body {
+      background-color: #f8f9fa;
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+    
+    .card {
+      border: none;
+      border-radius: 8px;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+    
+    .card-header {
+      background-color: var(--primary-color);
+      color: white;
+      padding: 1.5rem;
+      border-bottom: none;
+    }
+    
+    .card-title {
+      font-weight: 600;
+      margin: 0;
+    }
+    
+    .btn-salir {
+      position: absolute;
+      top: 1.5rem;
+      right: 1.5rem;
+      background-color: #ffffff;
+      border: 1px solid rgb(255, 0, 0);
+      color: rgb(255, 0, 0);
+      transition: all 0.3s;
+    }
+    
+    .btn-salir:hover {
+      background-color: hwb(0 0% 0% / 0.603);
+    }
+    
+    .form-control, .btn {
+      border-radius: 6px;
+    }
+    
+    .btn-primary {
+      background-color: var(--accent-color);
+      border-color: var(--accent-color);
+    }
+    
+    .btn-primary:hover {
+      background-color: #2980b9;
+      border-color: #2980b9;
+    }
+    
+    .btn-success {
+      background-color: #27ae60;
+      border-color: #27ae60;
+    }
+    
+    .btn-success:hover {
+      background-color: #219653;
+      border-color: #219653;
+    }
+    
+    .table {
+      border-collapse: separate;
+      border-spacing: 0;
+    }
+    
+    .table thead th {
+      background-color: var(--secondary-color);
+      color: white;
+      border: none;
+      padding: 12px 15px;
+    }
+    
+    .table tbody tr {
+      transition: all 0.2s;
+    }
+    
+    .table tbody tr:hover {
+      background-color: rgba(52, 152, 219, 0.1);
+    }
+    
+    .table tbody td {
+      padding: 12px 15px;
+      border-bottom: 1px solid #e0e0e0;
+    }
+    
+    .spinner-border {
+      width: 3rem;
+      height: 3rem;
+    }
+    
+    .badge {
+      padding: 6px 10px;
+      font-weight: 500;
+      border-radius: 4px;
+    }
+    
+    .alert {
+      border-radius: 6px;
+    }
+    
+    @media (max-width: 768px) {
+      .card-header {
+        padding: 1rem;
+      }
+      
+      .btn-salir {
+        position: relative;
+        top: auto;
+        right: auto;
+        margin-bottom: 1rem;
+      }
+
+     
+    }
+
+
+      .page-item.disabled .page-link {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+        .page-item.active .page-link {
+            z-index: 3;
+            color: #fff;
+            background-color: #0d6efd;
+            border-color: #0d6efd;
+        }
+
+        body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    transition: background 0.5s ease;
+  }
+
+  h2 {
+    font-weight: 600;
+    color: #1f3a93;
+    margin-bottom: 0;
+    transition: color 0.3s;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(22, 160, 133, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: scale(1.05);
+    background: #148f77;
+  }
+
+  .btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5d6d70;
+  }
+
+  .table-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .table th {
+    background: #2c3e50;
+    color: #ffffff;
+    font-weight: 500;
+    border: none;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f6f9fc;
+    transition: background 0.3s;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #1f3a93, #2980b9);
+    color: white;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #0a07c2, #0f046b);
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #066d96;
+    transform: scale(1.03);
+  }
+
+  .pagination .page-link {
+    color: #2c3e50;
+    border-radius: 0.5rem;
+    transition: background 0.3s;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #ecf0f1;
+  }
+
+  small.form-text {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .bi {
+    vertical-align: -0.125em;
+    margin-right: 0.3rem;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+  </style>
+</head>
+<body>
+  <div class="container py-4">
+    <div class="card">
+      <div class="card-header position-relative">
+        <h2 class="card-title">
+          <i class="bi bi-graph-down"></i> Reporte de Vendedores con Menor Desempeño
+        </h2>
+        <a class="btn btn-salir" href="{{ url_for('menu') }}">
+  <i class="bi bi-box-arrow-left"></i> Salir
+</a>
+
+      </div>
+      
+      <div class="card-body">
+        <div class="row mb-4">
+          <div class="col-md-8 mx-auto">
+            <div class="d-flex flex-column flex-md-row align-items-center justify-content-between p-3 bg-light rounded">
+              <div class="mb-3 mb-md-0">
+                <h5 class="mb-0 text-dark">Filtros del Reporte</h5>
+                <small class="text-muted">Seleccione la cantidad de vendedores a mostrar</small>
+              </div>
+              
+              <div class="d-flex align-items-center">
+                <div class="me-3">
+                  <label for="numVendedores" class="form-label mb-0 fw-medium">Número de vendedores:</label>
+                </div>
+                <div class="me-3" style="width: 80px;">
+                  <input type="number" id="numVendedores" class="form-control text-center" value="5" min="1">
+                </div>
+                <button type="button" class="btn btn-success" onclick="cargarReporte()">
+                  <i class="bi bi-arrow-repeat"></i> Actualizar
+                </button>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="text-end mb-3">
+          <button class="btn btn-primary d-none" id="btnPDF" onclick="generarPDF()">
+            <i class="bi bi-file-earmark-pdf-fill"></i> Exportar a PDF
+          </button>
+        </div>
+
+        <div class="reporte-container">
+          <div class="d-flex justify-content-between align-items-center mb-3">
+            <h4 class="mb-0 text-dark">
+              <i class="bi bi-list-check"></i> Resultados del Análisis
+            </h4>
+            <span class="badge bg-secondary" id="contadorResultados">0 registros</span>
+          </div>
+          
+          <div class="border rounded">
+            <div id="resultados" class="text-center p-5">
+              <div class="spinner-border text-primary" role="status">
+                <span class="visually-hidden">Cargando...</span>
+              </div>
+              <div class="mt-3 fw-medium">Cargando datos de vendedores...</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- JavaScript -->
+  <script>
+    let vendedoresActuales = [];
+
+    function cargarReporte() {
+      const resultadosDiv = document.getElementById('resultados');
+      const btnPDF = document.getElementById('btnPDF');
+      const contador = document.getElementById('contadorResultados');
+      
+      btnPDF.classList.add('d-none');
+      vendedoresActuales = [];
+
+      resultadosDiv.innerHTML = `
+        <div class="text-center p-5">
+          <div class="spinner-border text-primary" role="status">
+            <span class="visually-hidden">Cargando...</span>
+          </div>
+          <div class="mt-3 fw-medium">Cargando datos de vendedores...</div>
+        </div>`;
+
+      const limite = document.getElementById('numVendedores').value;
+      fetch(`/api/vendedores/peores?limit=${limite}`)
+        .then(response => {
+          if (!response.ok) throw new Error(`HTTP ${response.status}`);
+          return response.json();
+        })
+        .then(data => {
+          if (!data.vendedores || data.vendedores.length === 0) {
+            resultadosDiv.innerHTML = `
+              <div class="alert alert-warning m-4">
+                <i class="bi bi-exclamation-triangle-fill"></i> No se encontraron vendedores con ventas registradas.
+              </div>`;
+            contador.textContent = "0 registros";
+            return;
+          }
+
+          vendedoresActuales = data.vendedores;
+          contador.textContent = `${data.vendedores.length} ${data.vendedores.length === 1 ? 'registro' : 'registros'}`;
+
+          let html = `
+            <div class="table-responsive">
+              <table class="table table-hover mb-0" id="tablaVendedores">
+                <thead>
+                  <tr>
+                    <th class="text-center">#</th>
+                    <th>Código</th>
+                    <th>Vendedor</th>
+                    <th class="text-end">Ventas Totales</th>
+                    <th class="text-center">Acciones</th>
+                  </tr>
+                </thead>
+                <tbody>`;
+          
+          data.vendedores.forEach((v, index) => {
+            const desempenio = v.total_ventas < 1000 ? 'danger' : v.total_ventas < 3000 ? 'warning' : 'success';
+            
+            html += `
+              <tr>
+                <td class="text-center fw-medium">${index + 1}</td>
+                <td><span class="badge bg-dark">${v.COD_VEN}</span></td>
+                <td>${v.nombre_completo}</td>
+                <td class="text-end fw-medium">
+                  <span class="badge bg-${desempenio}">S/. ${Number(v.total_ventas).toFixed(2)}</span>
+                </td>
+                <td class="text-center">
+                  <button class="btn btn-sm btn-outline-primary">
+                    <i class="bi bi-eye-fill"></i> Detalle
+                  </button>
+                </td>
+              </tr>`;
+          });
+
+          html += `</tbody></table></div>`;
+          resultadosDiv.innerHTML = html;
+          btnPDF.classList.remove('d-none');
+        })
+        .catch(error => {
+          console.error("Error:", error);
+          resultadosDiv.innerHTML = `
+            <div class="alert alert-danger m-4">
+              <i class="bi bi-x-circle-fill"></i> Error al cargar datos: ${error.message}
+            </div>`;
+          contador.textContent = "Error";
+        });
+    }
+
+    function generarPDF() {
+      const { jsPDF } = window.jspdf;
+      const doc = new jsPDF({
+        orientation: 'landscape'
+      });
+
+      // Encabezado
+      doc.setFontSize(18);
+      doc.setTextColor(44, 62, 80);
+      doc.setFont('helvetica', 'bold');
+      doc.text("Reporte de Vendedores con Menor Desempeño", 14, 20);
+      
+      // Fecha
+      doc.setFontSize(10);
+      doc.setTextColor(100, 100, 100);
+      doc.setFont('helvetica', 'normal');
+      doc.text(`Generado el: ${new Date().toLocaleDateString()}`, 14, 30);
+      
+      // Tabla
+      const data = vendedoresActuales.map((v, index) => [
+        index + 1,
+        v.COD_VEN,
+        v.nombre_completo,
+        `S/. ${Number(v.total_ventas).toFixed(2)}`,
+        v.total_ventas < 1000 ? 'Bajo' : v.total_ventas < 3000 ? 'Medio' : 'Alto'
+      ]);
+
+      doc.autoTable({
+        head: [['#', 'Código', 'Vendedor', 'Ventas Totales', 'Desempeño']],
+        body: data,
+        startY: 40,
+        theme: 'grid',
+        headStyles: {
+          fillColor: [44, 62, 80],
+          textColor: 255,
+          fontStyle: 'bold'
+        },
+        columnStyles: {
+          0: { cellWidth: 'auto', halign: 'center' },
+          3: { halign: 'right' },
+          4: { halign: 'center' }
+        },
+        styles: {
+          fontSize: 10,
+          cellPadding: 5,
+          overflow: 'linebreak'
+        },
+        margin: { top: 40 }
+      });
+
+      // Pie de página
+      const pageCount = doc.internal.getNumberOfPages();
+      for(let i = 1; i <= pageCount; i++) {
+        doc.setPage(i);
+        doc.setFontSize(10);
+        doc.setTextColor(150);
+        doc.text(`Página ${i} de ${pageCount}`, doc.internal.pageSize.width - 40, doc.internal.pageSize.height - 10);
+      }
+
+      doc.save(`Reporte_Vendedores_${new Date().toISOString().slice(0,10)}.pdf`);
+    }
+
+    function salir() {
+      window.location.href = '/dashboard';
+    }
+
+    // Cargar al inicio
+    document.addEventListener('DOMContentLoaded', function() {
+      cargarReporte();
+      
+      // Configurar tooltips
+      const tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+      tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl);
+      });
+    });
+  </script>
+  
+  <!-- Bootstrap JS Bundle -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

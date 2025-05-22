@@ -1,0 +1,446 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <title>Detalles de Factura</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+     <!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    transition: background 0.5s ease;
+  }
+
+  h2 {
+    font-weight: 600;
+    color: #1f3a93;
+    margin-bottom: 0;
+    transition: color 0.3s;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(22, 160, 133, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: scale(1.05);
+    background: #148f77;
+  }
+
+  .btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5d6d70;
+  }
+
+  .table-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .table th {
+    background: #2c3e50;
+    color: #ffffff;
+    font-weight: 500;
+    border: none;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f6f9fc;
+    transition: background 0.3s;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #1f3a93, #2980b9);
+    color: white;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #f39c12, #f1c40f);
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #e67e22;
+    transform: scale(1.03);
+  }
+
+  .pagination .page-link {
+    color: #2c3e50;
+    border-radius: 0.5rem;
+    transition: background 0.3s;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #ecf0f1;
+  }
+
+  small.form-text {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .bi {
+    vertical-align: -0.125em;
+    margin-right: 0.3rem;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+ 
+</head>
+<body class="container mt-4">
+
+
+ <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+  <i class="bi bi-people-fill me-2"></i> Detalles de Factura
+</h2>
+
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalDetalleFactura">
+      <i class="bi bi-plus-circle"></i> Nuevo Detalle
+    </button>
+  </div>
+
+
+  
+
+<!-- Tabla de detalles -->
+    <div class="table-container my-4">
+  <div class="table-responsive">
+    <table class="table table-striped table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>N° Factura</th>
+                <th>Fecha Factura</th>
+                <th>Cód. Producto</th>
+                <th>Producto</th>
+                <th>Cantidad</th>
+                <th>Precio Unit.</th>
+                <th>Acciones</th>
+            </tr>
+        </thead>
+        <tbody id="tabla-detalles-factura"></tbody>
+    </table>
+
+     <nav class="d-flex justify-content-center my-3">
+    <ul class="pagination" id="paginacion-detalles"></ul>
+  </nav>
+
+    <a href="{{ url_for('menu') }}" class="btn btn-secondary mt-3">Volver al Inicio</a>
+
+     </div>
+    </div>
+    <!-- Modal -->
+    <div class="modal fade" id="modalDetalleFactura" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-lg">
+            <div class="modal-content">
+                <form id="form-detalle-factura">
+                    <div class="modal-header">
+                        <h5 class="modal-title">Registro de Detalle</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+                    </div>
+                    <div class="modal-body row g-3">
+                        <div class="col-md-6">
+                            <label for="num_fac" class="form-label">N° Factura</label>
+                            <select id="num_fac" class="form-select" required>
+                                <option value="">Seleccione Factura</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="cod_pro" class="form-label">Producto</label>
+                            <select id="cod_pro" class="form-select" required>
+                                <option value="">Seleccione Producto</option>
+                            </select>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="can_ven" class="form-label">Cantidad</label>
+                            <input type="number" id="can_ven" class="form-control" min="1" required>
+                        </div>
+                        <div class="col-md-6">
+                            <label for="pre_ven" class="form-label">Precio Unitario</label>
+                            <input type="number" id="pre_ven" class="form-control" step="0.01" min="0.01" required>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        let paginaActual = 1;
+        const itemsPorPagina = 5;
+        let editMode = false;
+
+        // Cargar detalles
+        async function cargarDetalles(pagina = 1) {
+            try {
+                const response = await fetch(`/api/detalle_facturas?pagina=${pagina}&por_pagina=${itemsPorPagina}`);
+                if (!response.ok) throw new Error(`Error HTTP: ${response.status}`);
+                
+                const data = await response.json();
+                
+                if (!data.detalles || !data.total_paginas) {
+                    throw new Error("Estructura de respuesta inválida");
+                }
+                
+                const tbody = document.getElementById("tabla-detalles-factura");
+                tbody.innerHTML = "";
+                
+                data.detalles.forEach(d => {
+                    tbody.innerHTML += `
+                        <tr>
+                            <td>${d.NUM_FAC}</td>
+                            <td>${new Date(d.FEC_FAC).toLocaleDateString('es-ES')}</td>
+                            <td>${d.COD_PRO}</td>
+                            <td>${d.DES_PRO}</td>
+                            <td>${d.CAN_VEN}</td>
+                            <td>${d.PRE_VEN}</td>
+                            <td>
+                                <button class="btn btn-warning btn-sm me-1" 
+                                    onclick='editarDetalle(${JSON.stringify(d)})'>Editar</button>
+                                <button class="btn btn-danger btn-sm" 
+                                    onclick='eliminarDetalle("${d.NUM_FAC}", "${d.COD_PRO}")'>Eliminar</button>
+                            </td>
+                        </tr>`;
+                });
+                
+                actualizarPaginacion(data.total_paginas, pagina);
+                paginaActual = pagina;
+                
+            } catch (error) {
+                mostrarError(error);
+            }
+        }
+
+        // Función de paginación corregida
+        function actualizarPaginacion(totalPaginas, paginaActual) {
+            const paginacion = document.getElementById("paginacion-detalles");
+            paginacion.innerHTML = '';
+
+            // Botón Anterior
+            const liAnterior = document.createElement("li");
+            liAnterior.className = `page-item ${paginaActual === 1 ? 'disabled' : ''}`;
+            liAnterior.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+            liAnterior.onclick = () => paginaActual > 1 && cargarDetalles(paginaActual - 1);
+            paginacion.appendChild(liAnterior);
+
+            // Números de página
+            const inicio = Math.max(1, paginaActual - 2);
+            const fin = Math.min(totalPaginas, paginaActual + 2);
+            
+            for (let i = inicio; i <= fin; i++) {
+                const li = document.createElement("li");
+                li.className = `page-item ${i === paginaActual ? 'active' : ''}`;
+                li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+                li.onclick = () => cargarDetalles(i);
+                paginacion.appendChild(li);
+            }
+
+            // Botón Siguiente
+            const liSiguiente = document.createElement("li");
+            liSiguiente.className = `page-item ${paginaActual === totalPaginas ? 'disabled' : ''}`;
+            liSiguiente.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+            liSiguiente.onclick = () => paginaActual < totalPaginas && cargarDetalles(paginaActual + 1);
+            paginacion.appendChild(liSiguiente);
+        }
+
+        // Cargar productos
+        async function cargarProductos() {
+            try {
+                const response = await fetch("/api/productos/lista");
+                if (!response.ok) throw new Error("Error cargando productos");
+                const data = await response.json();
+                
+                const select = document.getElementById("cod_pro");
+                select.innerHTML = '<option value="">Seleccione Producto</option>';
+                data.forEach(p => {
+                    select.innerHTML += `<option value="${p.COD_PRO}">${p.COD_PRO} - ${p.DES_PRO}</option>`;
+                });
+            } catch (error) {
+                mostrarError(error);
+            }
+        }
+
+        // Cargar facturas
+        async function cargarFacturas() {
+            try {
+                const response = await fetch("/api/facturas?por_pagina=1000");
+                if (!response.ok) throw new Error("Error cargando facturas");
+                const data = await response.json();
+                
+                const select = document.getElementById("num_fac");
+                select.innerHTML = '<option value="">Seleccione Factura</option>';
+                data.facturas.forEach(f => {
+                    select.innerHTML += `<option value="${f.NUM_FAC}">${f.NUM_FAC} - ${new Date(f.FEC_FAC).toLocaleDateString('es-ES')}</option>`;
+                });
+            } catch (error) {
+                mostrarError(error);
+            }
+        }
+
+        // Manejo del formulario
+        document.getElementById("form-detalle-factura").addEventListener("submit", async (e) => {
+            e.preventDefault();
+            
+            const detalle = {
+                NUM_FAC: document.getElementById("num_fac").value,
+                COD_PRO: document.getElementById("cod_pro").value,
+                CAN_VEN: parseInt(document.getElementById("can_ven").value),
+                PRE_VEN: parseFloat(document.getElementById("pre_ven").value)
+            };
+
+            try {
+                const metodo = editMode ? "PUT" : "POST";
+                const response = await fetch("/api/detalle_facturas", {
+                    method: metodo,
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(detalle)
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Error ${response.status}`);
+                }
+
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    cargarDetalles(paginaActual);
+                    bootstrap.Modal.getInstance(document.getElementById('modalDetalleFactura')).hide();
+                    editMode = false;
+                }
+            } catch (error) {
+                mostrarError(error);
+            }
+        });
+
+        // Editar detalle
+        async function editarDetalle(detalle) {
+            editMode = true;
+            try {
+                await Promise.all([cargarFacturas(), cargarProductos()]);
+                
+                // Esperar a que se actualicen los selects
+                await new Promise(resolve => setTimeout(resolve, 100));
+                
+                document.getElementById("num_fac").value = detalle.NUM_FAC;
+                document.getElementById("cod_pro").value = detalle.COD_PRO;
+                document.getElementById("can_ven").value = detalle.CAN_VEN;
+                document.getElementById("pre_ven").value = detalle.PRE_VEN;
+                
+                new bootstrap.Modal(document.getElementById('modalDetalleFactura')).show();
+            } catch (error) {
+                mostrarError(error);
+            }
+        }
+
+        // Eliminar detalle
+        async function eliminarDetalle(numFac, codPro) {
+            if (!confirm(`¿Eliminar detalle ${numFac}-${codPro}?`)) return;
+            
+            try {
+                const response = await fetch("/api/detalle_facturas", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ NUM_FAC: numFac, COD_PRO: codPro })
+                });
+
+                if (!response.ok) {
+                    const errorData = await response.json();
+                    throw new Error(errorData.error || `Error ${response.status}`);
+                }
+
+                const resultado = await response.json();
+                
+                if (resultado.success) {
+                    cargarDetalles(paginaActual);
+                }
+            } catch (error) {
+                mostrarError(error);
+            }
+        }
+
+        // Manejo de errores
+        function mostrarError(error) {
+            console.error("Error:", error);
+            alert(`Error: ${error.message}`);
+        }
+
+        // Inicialización
+        window.addEventListener('DOMContentLoaded', () => {
+            cargarDetalles();
+            cargarFacturas();
+            cargarProductos();
+            
+            document.getElementById('modalDetalleFactura').addEventListener('hidden.bs.modal', () => {
+                editMode = false;
+                document.getElementById('form-detalle-factura').reset();
+            });
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Dashboard | Sistema de Ventas</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        :root {
+            --primary-color: #5e35b1;
+            --secondary-color: #3949ab;
+            --accent-color: #7c4dff;
+            --light-color: #f5f3ff;
+            --dark-color: #1a237e;
+            --sidebar-width: 280px;
+        }
+
+        body {
+            font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+            background-color: #f8f9fa;
+            overflow-x: hidden;
+        }
+
+        /* Sidebar */
+        .sidebar {
+            width: var(--sidebar-width);
+            height: 100vh;
+            position: fixed;
+            left: 0;
+            top: 0;
+            background: linear-gradient(180deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            padding: 1.5rem 0;
+            overflow-y: auto; /* Activa el scroll vertical */
+            box-shadow: 5px 0 15px rgba(0, 0, 0, 0.1);
+            transition: all 0.3s;
+            z-index: 1000;
+        }
+
+        .sidebar-brand {
+            padding: 0 1.5rem 1.5rem;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 1rem;
+        }
+
+        .sidebar-brand h3 {
+            font-weight: 700;
+            margin-bottom: 0.2rem;
+        }
+
+        .sidebar-brand p {
+            font-size: 0.85rem;
+            opacity: 0.8;
+            margin-bottom: 0;
+        }
+
+        .sidebar-menu {
+            padding: 0 1rem;
+        }
+
+        .menu-title {
+            font-size: 0.75rem;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            color: rgba(255, 255, 255, 0.5);
+            margin: 1.5rem 0 0.5rem 1rem;
+        }
+
+        .menu-item {
+            display: flex;
+            align-items: center;
+            padding: 0.75rem 1rem;
+            margin: 0.25rem 0;
+            border-radius: 8px;
+            color: rgba(255, 255, 255, 0.8);
+            text-decoration: none;
+            transition: all 0.3s;
+        }
+
+        .menu-item:hover, .menu-item.active {
+            background-color: rgba(255, 255, 255, 0.1);
+            color: white;
+        }
+
+        .menu-item i {
+            width: 24px;
+            margin-right: 12px;
+            text-align: center;
+            font-size: 1.1rem;
+        }
+
+        /* Main Content */
+        .main-content {
+            margin-left: var(--sidebar-width);
+            padding: 2rem;
+            transition: all 0.3s;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .page-title h2 {
+            font-weight: 700;
+            color: var(--dark-color);
+            margin-bottom: 0.25rem;
+        }
+
+        .page-title p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        .user-menu {
+            display: flex;
+            align-items: center;
+        }
+
+        .user-img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            background-color: var(--accent-color);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: 600;
+            margin-left: 1rem;
+        }
+
+        /* Cards */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 1.5rem;
+            transition: all 0.3s;
+            border-left: 4px solid var(--accent-color);
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+        }
+
+        .card-header {
+            background-color: white;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            font-weight: 600;
+            padding: 1rem 1.5rem;
+            border-radius: 12px 12px 0 0 !important;
+        }
+
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .stat-card {
+            text-align: center;
+            padding: 1.5rem;
+        }
+
+        .stat-card i {
+            font-size: 2.5rem;
+            margin-bottom: 1rem;
+            color: var(--accent-color);
+        }
+
+        .stat-card h3 {
+            font-size: 2rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+        }
+
+        .stat-card p {
+            color: #6c757d;
+            margin-bottom: 0;
+        }
+
+        /* Tables */
+        .table-container {
+            background-color: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+
+        .table {
+            margin-bottom: 0;
+        }
+
+        .table thead th {
+            background-color: #f8f9fa;
+            border-bottom-width: 1px;
+            font-weight: 600;
+            color: var(--dark-color);
+        }
+
+        .table tbody tr:last-child td {
+            border-bottom: none;
+        }
+
+        .badge-status {
+            padding: 0.35rem 0.65rem;
+            font-weight: 500;
+            border-radius: 50px;
+        }
+
+        /* Charts */
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+
+        /* Responsive */
+        @media (max-width: 992px) {
+            .sidebar {
+                left: -280px;
+            }
+
+            .main-content {
+                margin-left: 0;
+            }
+
+            .sidebar.active {
+                left: 0;
+            }
+
+            .main-content.active {
+                margin-left: 280px;
+            }
+        }
+
+        /* Animations */
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .fade-in {
+            animation: fadeIn 0.5s ease-out;
+        }
+
+        /* Right sidebar tables */
+        .right-tables {
+            position: fixed;
+            right: 2rem;
+            top: 120px;
+            width: 300px;
+            z-index: 100;
+        }
+
+        .right-table-card {
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 1.5rem;
+            overflow: hidden;
+        }
+
+        .right-table-header {
+            padding: 0.75rem 1rem;
+            background-color: var(--primary-color);
+            color: white;
+            font-weight: 600;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .right-table-body {
+            padding: 0;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+
+        .right-table {
+            width: 100%;
+            margin-bottom: 0;
+        }
+
+        .right-table th, .right-table td {
+            padding: 0.75rem 1rem;
+            font-size: 0.85rem;
+        }
+
+        .right-table th {
+            background-color: #f8f9fa;
+            position: sticky;
+            top: 0;
+        }
+
+        .view-all-btn {
+            font-size: 0.75rem;
+            padding: 0.25rem 0.5rem;
+        }
+    </style>
+</head>
+<body>
+    <!-- Sidebar -->
+    <div class="sidebar" id="sidebar">
+        <div class="sidebar-brand">
+            <h3><i class="fas fa-cash-register me-2"></i>VentaPro</h3>
+            <p>Panel de Administración</p>
+        </div>
+
+        <div class="sidebar-menu">
+            <div class="menu-title">Principal</div>
+            <a href="#" class="menu-item active">
+                <i class="fas fa-tachometer-alt"></i>
+                <span>Dashboard</span>
+            </a>
+
+            <div class="menu-title">Administración</div>
+            <a href="{{ url_for('clientes') }}" class="menu-item">
+                <i class="fas fa-users"></i>
+                <span>Clientes</span>
+            </a>
+            <a href="{{ url_for('vendedores') }}" class="menu-item">
+                <i class="fas fa-user-tie"></i>
+                <span>Vendedores</span>
+            </a>
+            <a href="{{ url_for('proveedores') }}" class="menu-item">
+                <i class="fas fa-truck"></i>
+                <span>Proveedores</span>
+            </a>
+            <a href="{{ url_for('productos') }}" class="menu-item">
+                <i class="fas fa-boxes"></i>
+                <span>Productos</span>
+            </a>
+            <a href="{{ url_for('distritos') }}" class="menu-item">
+                <i class="fas fa-map-marker-alt"></i>
+                <span>Distritos</span>
+            </a>
+
+            <div class="menu-title">Operaciones</div>
+            <a href="{{ url_for('facturas') }}" class="menu-item">
+                <i class="fas fa-file-invoice-dollar"></i>
+                <span>Facturas</span>
+            </a>
+            <a href="{{ url_for('ordenes_compra') }}" class="menu-item">
+                <i class="fas fa-shopping-cart"></i>
+                <span>Órdenes de Compra</span>
+            </a>
+            <a href="{{ url_for('abastecimientos') }}" class="menu-item">
+                <i class="fas fa-warehouse"></i>
+                <span>Abastecimiento</span>
+            </a>
+
+            <div class="menu-title">Detalles</div>
+            <a href="{{ url_for('detalle_compras') }}" class="menu-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Detalle Compra</span>
+            </a>
+            <a href="{{ url_for('detalle_facturas') }}" class="menu-item">
+                <i class="fas fa-chart-pie"></i>
+                <span>Detalle Factura</span>
+            </a>
+        </div>
+    </div>
+
+
+    <!-- Main Content -->
+    <div class="main-content" id="mainContent">
+        <div class="header">
+            <div class="page-title">
+                <h2>Dashboard</h2>
+                <p>Resumen general del sistema</p>
+            </div>
+            <div class="user-menu">
+                <div class="dropdown">
+                    <button class="btn btn-light dropdown-toggle" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="fas fa-user-circle me-2"></i>Administrador
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="dropdownMenuButton">
+                        <li><a class="dropdown-item" href="{{ url_for('perfil') }}"><i class="fas fa-user-cog me-2"></i>Perfil</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('reporte_vendedores') }}"><i class="fas fa-file-alt me-2"></i>Reporte Vendedores</a></li>
+                        <li><a class="dropdown-item" href="{{ url_for('auditoria') }}"><i class="fas fa-cog me-2"></i>Auditoria</a></li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li><a class="dropdown-item" href="{{ url_for('inicio') }}"><i class="fas fa-sign-out-alt me-2"></i>Cerrar Sesión</a></li>
+                    </ul>
+                </div>
+                <div class="user-img">A</div>
+            </div>
+        </div>
+
+        <div class="row fade-in">
+            <!-- Estadísticas -->
+            <div class="col-md-3">
+    <div class="card stat-card">
+        <i class="fas fa-users"></i>
+        <h3 id="total-clientes">0</h3>  <!-- Agregué un ID -->
+        <p>Clientes</p>
+    </div>
+</div>
+           <div class="col-md-3">
+    <div class="card stat-card">
+        <i class="fas fa-user-tie"></i>
+        <h3 id="total-vendedores">0</h3> 
+        <p>Vendedores</p>
+    </div>
+</div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <i class="fas fa-truck"></i>
+                    <h3 id="total-proveedores">0</h3> 
+                    <p>Proveedores</p>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="card stat-card">
+                    <i class="fas fa-boxes"></i>
+                    <h3 id="total-productos">0</h3> 
+                    <p>Productos</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 fade-in">
+            <!-- Gráficos -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-file-invoice-dollar me-2"></i>Estado Facturas
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+                            <canvas id="invoicesChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header">
+                        <i class="fas fa-chart-pie me-2"></i>Distribución de Productos
+                    </div>
+                    <div class="card-body">
+                        <div class="chart-container">
+
+                            <canvas id="productsChart"></canvas>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mt-4 fade-in">
+            <!-- Tablas -->
+            <div class="col-lg-6">
+                <div class="card">
+                    <div class="card-header d-flex justify-content-between align-items-center">
+                        <span><i class="fas fa-file-invoice-dollar me-2"></i>Últimas Facturas</span>
+                        <a href="{{ url_for('facturas') }}" class="btn btn-sm btn-outline-primary">Ver Todas</a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-container">
+                            <table class="table table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>N° Factura</th>
+                                        <th>Fecha Emisión</th>
+                                        <th>Cliente</th>
+                                        <th>Estado</th>
+                                    </tr>
+                                </thead>
+                                                    <tbody id="tabla-facturas">
+                        <!-- Los distritos se cargarán aquí mediante JavaScript -->
+                    </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-6">
+    <div class="card">
+        <div class="card-header d-flex justify-content-between align-items-center">
+            <span><i class="fas fa-map-marker-alt me-2"></i>Distritos Disponibles</span>
+            <a href="{{ url_for('distritos') }}" class="btn btn-sm btn-outline-primary">Ver Todos</a>
+        </div>
+        <div class="card-body p-0">
+            <div class="table-container">
+                <table class="table table-hover">
+                    <thead>
+                        <tr>
+                            <th>Código</th>
+                            <th>Nombre</th>
+                        </tr>
+                    </thead>
+                    <tbody id="tabla-distritos">
+                        <!-- Los distritos se cargarán aquí mediante JavaScript -->
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+        </div>
+    </div>
+
+    <!-- Bootstrap 5 JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+// ==================== FUNCIÓN PARA DISTRITOS ====================
+async function cargarDistritos() {
+    const apiUrl = '/api/distritos?pagina=1&por_pagina=5';
+    const tbody = document.getElementById('tabla-distritos');
+
+    try {
+        // Mostrar estado de carga
+        tbody.innerHTML = '<tr><td colspan="2" class="text-center">Cargando distritos...</td></tr>';
+        
+        const response = await fetch(apiUrl);
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Limpiar la tabla
+        tbody.innerHTML = '';
+        
+        // Verificar si hay datos
+        if (!data.distritos || data.distritos.length === 0) {
+            tbody.innerHTML = '<tr><td colspan="2" class="text-center">No se encontraron distritos</td></tr>';
+            return;
+        }
+        
+        // Llenar la tabla con los datos
+        data.distritos.forEach(distrito => {
+            const row = document.createElement('tr');
+            row.innerHTML = `
+                <td>${distrito.COD_DIS}</td>
+                <td>${distrito.NOM_DIS}</td>
+            `;
+            tbody.appendChild(row);
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar distritos:', error);
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="2" class="text-center text-danger">
+                    Error al cargar los distritos: ${error.message}
+                </td>
+            </tr>
+        `;
+    }
+}
+
+
+function cargarFacturas(pagina = 1, porPagina = 5) {
+    fetch(`/api/facturas?pagina=${pagina}&por_pagina=${porPagina}`)
+        .then(response => response.json())
+        .then(data => {
+            const tabla = document.getElementById('tabla-facturas');
+            tabla.innerHTML = ''; // Limpiar la tabla antes de agregar nuevos datos
+
+            // Llenar la tabla con los datos de las facturas
+            data.facturas.forEach(factura => {
+                const fila = document.createElement('tr');
+                
+                // Formatear la fecha para mostrarla mejor
+                const fechaEmision = new Date(factura.FEC_FAC).toLocaleDateString();
+                
+                // Determinar el estado con un ícono y color
+                let estadoHTML = '';
+                if (factura.EST_FAC === '2') {
+                    estadoHTML = '<span class="badge bg-success">Pagada</span>';
+                } else if (factura.EST_FAC === '1') {
+                    estadoHTML = '<span class="badge bg-warning">Cancelada</span>';
+                } else if (factura.EST_FAC === '3') {
+                    estadoHTML = '<span class="badge bg-danger">Anulada</span>';
+                }
+
+                fila.innerHTML = `
+                    <td>${factura.NUM_FAC}</td>
+                    <td>${fechaEmision}</td>
+                    <td>${factura.NOM_CLI || 'Sin cliente'}</td>
+                    <td>${estadoHTML}</td>
+                `;
+                
+                // Opcional: agregar evento de clic para editar
+                fila.addEventListener('click', () => {
+                    // Aquí puedes implementar la edición de la factura
+                    console.log('Editar factura:', factura.NUM_FAC);
+                });
+
+                tabla.appendChild(fila);
+            });
+
+        })
+        .catch(error => {
+            console.error('Error al cargar las facturas:', error);
+            // Mostrar mensaje de error al usuario
+            const tabla = document.getElementById('tabla-facturas');
+            tabla.innerHTML = '<tr><td colspan="4" class="text-center text-danger">Error al cargar las facturas</td></tr>';
+        });
+}
+
+
+// ==================== FUNCIÓN PARA VENDEDORES ====================
+async function cargarTotalVendedores() {
+    const elementoTotal = document.getElementById('total-vendedores');
+    
+    try {
+        // Mostrar estado de carga
+        elementoTotal.textContent = "...";
+        
+        // Usamos el endpoint que devuelve solo el COUNT
+        const response = await fetch('/api/vendedores/count');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        // Actualizar el total
+        elementoTotal.textContent = data.total || 0;
+        
+    } catch (error) {
+        console.error('Error al cargar total de vendedores:', error);
+        elementoTotal.textContent = "Error";
+    }
+}
+
+// ==================== FUNCIÓN PARA CLIENTES ====================
+async function cargarTotalClientes() {
+    const elementoTotal = document.getElementById('total-clientes');
+    
+    if (!elementoTotal) {
+        console.error('Elemento con ID "total-clientes" no encontrado');
+        return;
+    }
+    
+    try {
+        elementoTotal.textContent = "...";
+        
+        const response = await fetch('/api/clientes/count');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success === false) {
+            throw new Error(data.error || 'Error desconocido');
+        }
+        
+        elementoTotal.textContent = data.total || 0;
+        
+    } catch (error) {
+        console.error('Error al cargar total de clientes:', error);
+        if (elementoTotal) {
+            elementoTotal.textContent = "Error";
+            elementoTotal.classList.add('text-danger');
+        }
+    }
+}
+
+// ==================== FUNCIÓN PARA PROVEEDORES ====================
+async function cargarTotalProveedores() {
+    const elementoTotal = document.getElementById('total-proveedores');
+    
+    if (!elementoTotal) {
+        console.error('Elemento con ID "total-proveedores" no encontrado');
+        return;
+    }
+    
+    try {
+        elementoTotal.textContent = "...";
+        
+        const response = await fetch('/api/proveedores/count');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success === false) {
+            throw new Error(data.error || 'Error desconocido');
+        }
+        
+        elementoTotal.textContent = data.total || 0;
+        
+    } catch (error) {
+        console.error('Error al cargar total de proveedores:', error);
+        if (elementoTotal) {
+            elementoTotal.textContent = "Error";
+            elementoTotal.classList.add('text-danger');
+        }
+    }
+}
+
+// ==================== FUNCIÓN PARA PRODUCTOS ====================
+async function cargarTotalProductos() {
+    const elementoTotal = document.getElementById('total-productos');
+    
+    if (!elementoTotal) {
+        console.error('Elemento con ID "total-productos" no encontrado');
+        return;
+    }
+    
+    try {
+        elementoTotal.textContent = "...";
+        
+        const response = await fetch('/api/productos/count');
+        
+        if (!response.ok) {
+            throw new Error(`Error HTTP: ${response.status}`);
+        }
+        
+        const data = await response.json();
+        
+        if (data.success === false) {
+            throw new Error(data.error || 'Error desconocido');
+        }
+        
+        elementoTotal.textContent = data.total || 0;
+        
+    } catch (error) {
+        console.error('Error al cargar total de productos:', error);
+        if (elementoTotal) {
+            elementoTotal.textContent = "Error";
+            elementoTotal.classList.add('text-danger');
+        }
+    }
+}
+
+// ==================== GRÁFICO DE PRODUCTOS POR LÍNEA ====================
+let productsChart = null;
+
+async function cargarGraficoProductos(tipo = 'doughnut') {
+    try {
+        const response = await fetch('/api/productos/por-linea');
+        const data = await response.json();
+        
+        // Destruir gráfico anterior si existe
+        if (productsChart) {
+            productsChart.destroy();
+        }
+        
+        const ctx = document.getElementById('productsChart');
+        
+        // Configuración base
+        const config = {
+            data: {
+                labels: data.labels,
+                datasets: [{
+                    label: 'Productos por Línea',
+                    data: data.cantidad,
+                    backgroundColor: [
+                        '#7c4dff',
+                        '#5e35b1',
+                        '#3949ab',
+                        '#2196f3',
+                        '#03a9f4'
+                    ],
+                    borderColor: '#fff',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            boxWidth: 12,
+                            padding: 20
+                        }
+                    },
+                    title: {
+                        display: true,
+                        text: 'Distribución por Línea de Producto',
+                        padding: {
+                            top: 10,
+                            bottom: 20
+                        }
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.label}: ${context.raw} productos`;
+                            }
+                        }
+                    }
+                },
+                cutout: tipo.includes('doughnut') ? '70%' : undefined
+            }
+        };
+        
+        // Crear gráfico según el tipo seleccionado
+        productsChart = new Chart(ctx, {
+            ...config,
+            type: tipo
+        });
+        
+    } catch (error) {
+        console.error('Error al cargar gráfico de productos:', error);
+        const container = document.querySelector('.chart-container');
+        if (container) {
+            container.innerHTML = `
+                <div class="alert alert-danger">
+                    Error al cargar los datos del gráfico: ${error.message}
+                </div>
+            `;
+        }
+    }
+}
+
+// ==================== GRÁFICO DE FACTURAS POR ESTADO ====================
+let invoicesChart = null;
+
+async function cargarGraficoFacturasPorEstado() {
+    try {
+        const response = await fetch('/api/facturas/por-estado');
+        const data = await response.json();
+        
+        if (invoicesChart) {
+            invoicesChart.destroy();
+        }
+        
+        const ctx = document.getElementById('invoicesChart').getContext('2d');
+        invoicesChart = new Chart(ctx, {
+            type: 'bar',
+            data: {
+                labels: data.estados,
+                datasets: [{
+                    label: 'Facturas por Estado',
+                    data: data.cantidades,
+                    backgroundColor: [
+                        'rgba(255, 99, 132, 0.7)',      // Cancelada - Rojo
+                        'rgba(54, 162, 235, 0.7)',      // Pagada - Azul
+                        'rgba(255, 159, 64, 0.7)',       // Anulada - Naranja
+                        'rgba(75, 192, 192, 0.7)',       // Pendiente - Verde azulado
+                        'rgba(153, 102, 255, 0.7)'       // Otros - Morado
+                    ],
+                    borderColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    borderWidth: 1,
+                    borderRadius: 6,
+                    hoverBackgroundColor: [
+                        'rgba(255, 99, 132, 1)',
+                        'rgba(54, 162, 235, 1)',
+                        'rgba(255, 159, 64, 1)',
+                        'rgba(75, 192, 192, 1)',
+                        'rgba(153, 102, 255, 1)'
+                    ],
+                    hoverBorderWidth: 2
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        display: true,
+                        position: 'top',
+                        labels: {
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleColor: '#fff',
+                        bodyColor: '#fff',
+                        borderColor: 'rgba(0,0,0,0.1)',
+                        borderWidth: 1,
+                        padding: 12,
+                        callbacks: {
+                            label: function(context) {
+                                return ` ${context.raw} facturas`;
+                            }
+                        }
+                    }
+                },
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        grid: {
+                            color: 'rgba(0,0,0,0.05)',
+                            drawBorder: false
+                        },
+                        ticks: {
+                            color: '#666'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Cantidad de Facturas',
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    },
+                    x: {
+                        grid: {
+                            display: false
+                        },
+                        ticks: {
+                            color: '#666'
+                        },
+                        title: {
+                            display: true,
+                            text: 'Estado de Factura',
+                            color: '#333',
+                            font: {
+                                weight: 'bold'
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    duration: 1500,
+                    easing: 'easeOutQuart'
+                }
+            }
+        });
+    } catch (error) {
+        console.error('Error al cargar gráfico de facturas por estado:', error);
+        // Mostrar mensaje de error en la interfaz si es necesario
+    }
+}
+// ==================== INICIALIZACIÓN ====================
+document.addEventListener('DOMContentLoaded', function() {
+    // Cargar datos según los elementos en la página
+    if (document.getElementById('tabla-distritos')) cargarDistritos();
+    if (document.getElementById('tabla-facturas')) cargarFacturas();
+    if (document.getElementById('total-vendedores')) cargarTotalVendedores();
+    if (document.getElementById('total-clientes')) cargarTotalClientes();
+    if (document.getElementById('total-proveedores')) cargarTotalProveedores();
+    if (document.getElementById('total-productos')) cargarTotalProductos();
+    if (document.getElementById('productsChart')) cargarGraficoProductos();
+    if (document.getElementById('invoicesChart')) cargarGraficoFacturasPorEstado();
+
+    // Selector de tipo de gráfico
+    const tipoGraficoSelect = document.getElementById('tipoGrafico');
+    if (tipoGraficoSelect) {
+        tipoGraficoSelect.addEventListener('change', function() {
+            cargarGraficoProductos(this.value);
+        });
+    }
+
+    // Menú responsive
+    const sidebar = document.getElementById('sidebar');
+    const mainContent = document.getElementById('mainContent');
+    const menuToggle = document.getElementById('menuToggle');
+
+    if (menuToggle) {
+        menuToggle.addEventListener('click', function() {
+            sidebar.classList.toggle('active');
+            mainContent.classList.toggle('active');
+        });
+    }
+
+    // Efecto fade-in para elementos
+    setTimeout(() => {
+        document.querySelectorAll('.fade-in').forEach(el => {
+            el.style.opacity = 1;
+        });
+    }, 300);
+});
+</script>
+</body>
+</html>

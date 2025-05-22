@@ -1,0 +1,427 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Proveedores</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+  <!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    transition: background 0.5s ease;
+  }
+
+  h2 {
+    font-weight: 600;
+    color: #1f3a93;
+    margin-bottom: 0;
+    transition: color 0.3s;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(22, 160, 133, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: scale(1.05);
+    background: #148f77;
+  }
+
+  .btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5d6d70;
+  }
+
+  .table-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .table th {
+    background: #2c3e50;
+    color: #ffffff;
+    font-weight: 500;
+    border: none;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f6f9fc;
+    transition: background 0.3s;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #1f3a93, #2980b9);
+    color: white;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #f39c12, #f1c40f);
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #e67e22;
+    transform: scale(1.03);
+  }
+
+  .pagination .page-link {
+    color: #2c3e50;
+    border-radius: 0.5rem;
+    transition: background 0.3s;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #ecf0f1;
+  }
+
+  small.form-text {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .bi {
+    vertical-align: -0.125em;
+    margin-right: 0.3rem;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+</head>
+<body class="container mt-4">
+  
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+  <i class="bi bi-people-fill me-2"></i> Proveedores
+</h2>
+
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalProveedor">
+      <i class="bi bi-plus-circle"></i> Nuevo Proveedor
+    </button>
+  </div>
+
+
+  <div class="table-container my-4">
+  <div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Código</th>
+        <th>Razón Social</th>
+        <th>Dirección</th>
+        <th>Teléfono</th>
+        <th>Código Distrito</th>
+        <th>Representante</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-proveedores"></tbody>
+  </table>
+
+ <!-- Paginación -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center" id="paginacion-proveedores"></ul>
+  </nav>
+
+  <a href="{{ url_for('menu') }}" class="btn btn-secondary mt-3">Volver al Inicio</a>
+
+
+  </div>
+  </div>
+
+  <div class="modal fade" id="modalProveedor" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="form-proveedor">
+        <div class="modal-header bg-warning text-dark">
+          <h5 class="modal-title">Formulario de Proveedor</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-2">
+              <label for="cod_prv" class="form-label">Código</label>
+              <input type="text" id="cod_prv" class="form-control" maxlength="5" 
+                     pattern="^PR\d{2}$" title="Formato: PR seguido de 2 dígitos (ej. PR01)" required />
+              <small class="form-text text-muted">Ejemplo: PR01</small>
+            </div>
+            
+            <div class="col-md-4">
+              <label for="rso_prv" class="form-label">Razón Social</label>
+              <input type="text" id="rso_prv" class="form-control" maxlength="80" 
+                     pattern="[A-Za-zÁ-ú0-9\s\.\-]+" title="Solo letras, números, espacios, puntos y guiones" required />
+              <small class="form-text text-muted">Ejemplo: FABER CASTELL</small>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="dir_prv" class="form-label">Dirección</label>
+              <input type="text" id="dir_prv" class="form-control" maxlength="100" required />
+              <small class="form-text text-muted">Ejemplo: AV. ISABEL LA CATOLICA 1875</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="tel_prv" class="form-label">Teléfono</label>
+              <input type="tel" id="tel_prv" class="form-control" maxlength="15" 
+                     pattern="\d{7,15}|^$" title="7 a 15 dígitos o vacío" />
+              <small class="form-text text-muted">Ejemplo: 4330895 (opcional)</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="cod_dis" class="form-label">Distrito</label>
+              <select id="cod_dis" class="form-select" required>
+                <option value="">Seleccione Distrito</option>
+              </select>
+              <small class="form-text text-muted">Ejemplo: D13</small>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="rep_pro" class="form-label">Representante</label>
+              <input type="text" id="rep_pro" class="form-control" maxlength="80" 
+                     pattern="[A-Za-zÁ-ú\s]+" title="Solo letras y espacios" />
+              <small class="form-text text-muted">Ejemplo: CARLOS AGUIRRE (opcional)</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-warning text-dark" id="btnGuardar">
+            <i class="bi bi-save"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <!-- JS Bootstrap y Código para CRUD -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let paginaProveedor = 1;
+    const porPagina = 5;
+    let editando = false;
+
+ 
+ // Función para cargar proveedores con paginación
+    function cargarProveedores(pagina = 1) {
+      fetch(`/api/proveedores?pagina=${pagina}&por_pagina=${porPagina}`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("tabla-proveedores");
+          const paginacion = document.getElementById("paginacion-proveedores");
+
+          tbody.innerHTML = "";
+          data.proveedores.forEach(p => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${p.COD_PRV}</td>
+                <td>${p.RSO_PRV}</td>
+                <td>${p.DIR_PRV}</td>
+                <td>${p.TEL_PRV}</td>
+                <td>${p.COD_DIS}</td>
+                <td>${p.REP_PRO || ''}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm me-1" onclick='editarProveedor(${JSON.stringify(p)})'>Editar</button>
+                  <button class="btn btn-danger btn-sm" onclick='eliminarProveedor("${p.COD_PRV}")'>Eliminar</button>
+                </td>
+              </tr>
+            `;
+          });
+
+          // Paginación modificada para que sea como en productos
+          paginacion.innerHTML = "";
+          
+          // Botón Anterior
+          if (pagina > 1) {
+            const anterior = document.createElement("li");
+            anterior.className = "page-item";
+            anterior.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+            anterior.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarProveedores(pagina - 1); 
+            };
+            paginacion.appendChild(anterior);
+          }
+          
+          // Números de página
+          for (let i = 1; i <= data.total_paginas; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === pagina ? "active" : ""}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarProveedores(i); 
+            };
+            paginacion.appendChild(li);
+          }
+          
+          // Botón Siguiente
+          if (pagina < data.total_paginas) {
+            const siguiente = document.createElement("li");
+            siguiente.className = "page-item";
+            siguiente.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+            siguiente.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarProveedores(pagina + 1); 
+            };
+            paginacion.appendChild(siguiente);
+          }
+          
+          paginaProveedor = pagina;
+        });
+    }
+
+    cargarProveedores();
+
+    // Evento envío formulario
+    document.getElementById("form-proveedor").addEventListener("submit", function (e) {
+      e.preventDefault();
+
+      const data = {
+        COD_PRV: document.getElementById("cod_prv").value,
+        RSO_PRV: document.getElementById("rso_prv").value,
+        DIR_PRV: document.getElementById("dir_prv").value,
+        TEL_PRV: document.getElementById("tel_prv").value,
+        COD_DIS: document.getElementById("cod_dis").value,
+        REP_PRO: document.getElementById("rep_pro").value,
+      };
+
+      fetch("/api/proveedores", {
+        method: editando ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data),
+      })
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.success) {
+          alert(editando ? "Proveedor actualizado." : "Proveedor registrado.");
+          cargarProveedores(paginaProveedor);
+          document.getElementById("form-proveedor").reset();
+          editando = false;
+          bootstrap.Modal.getInstance(document.getElementById("modalProveedor")).hide();
+        } else {
+          alert("Error: " + resp.error);
+        }
+      });
+    });
+
+    // Función para editar proveedor: llena formulario y abre modal
+    function editarProveedor(proveedor) {
+      editando = true;
+      document.getElementById("cod_prv").value = proveedor.COD_PRV;
+      document.getElementById("rso_prv").value = proveedor.RSO_PRV;
+      document.getElementById("dir_prv").value = proveedor.DIR_PRV;
+      document.getElementById("tel_prv").value = proveedor.TEL_PRV;
+      document.getElementById("cod_dis").value = proveedor.COD_DIS;
+      document.getElementById("rep_pro").value = proveedor.REP_PRO || '';
+      const modal = new bootstrap.Modal(document.getElementById("modalProveedor"));
+      modal.show();
+    }
+
+    // Función para eliminar proveedor con confirmación
+    function eliminarProveedor(cod_prv) {
+      if (confirm("¿Estás seguro de eliminar este proveedor?")) {
+        fetch("/api/proveedores", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ COD_PRV: cod_prv }),
+        })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.success) {
+            alert("Proveedor eliminado correctamente.");
+            cargarProveedores(paginaProveedor);
+          } else {
+            alert("Error: " + resp.error);
+          }
+        });
+      }
+    }
+
+    // Carga distritos al abrir el modal
+    function cargarDistritos() {
+      fetch("/api/distritos?pagina=1&por_pagina=1000")
+        .then(res => res.json())
+        .then(data => {
+          const select = document.getElementById("cod_dis");
+          select.innerHTML = '<option value="">Seleccione Distrito</option>';
+          data.distritos.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.COD_DIS;
+            opt.textContent = `${d.COD_DIS} - ${d.NOM_DIS}`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // Cuando el modal se abra, recarga distritos y resetea formulario si no está editando
+    const modalEl = document.getElementById('modalProveedor');
+    modalEl.addEventListener('show.bs.modal', () => {
+      cargarDistritos();
+      if (!editando) document.getElementById("form-proveedor").reset();
+    });
+
+  </script>
+</body>
+</html>

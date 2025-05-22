@@ -1,0 +1,463 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Abastecimientos</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    transition: background 0.5s ease;
+  }
+
+  h2 {
+    font-weight: 600;
+    color: #1f3a93;
+    margin-bottom: 0;
+    transition: color 0.3s;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(22, 160, 133, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: scale(1.05);
+    background: #148f77;
+  }
+
+  .btn-secondary {
+    background-color: #0b7b83;
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5d6d70;
+  }
+
+  .table-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .table th {
+    background: #2c3e50;
+    color: #ffffff;
+    font-weight: 500;
+    border: none;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f6f9fc;
+    transition: background 0.3s;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #1f3a93, #2980b9);
+    color: white;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #f39c12, #f1c40f);
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #e67e22;
+    transform: scale(1.03);
+  }
+
+  .pagination .page-link {
+    color: #2c3e50;
+    border-radius: 0.5rem;
+    transition: background 0.3s;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #ecf0f1;
+  }
+
+  small.form-text {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .bi {
+    vertical-align: -0.125em;
+    margin-right: 0.3rem;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+
+</head>
+<body class="container mt-4">
+  
+   <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+  <i class="bi bi-people-fill me-2"></i> Abastecimientos
+</h2>
+
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalAbastecimiento">
+      <i class="bi bi-plus-circle"></i> Nuevo Abastecimiento
+    </button>
+  </div>
+
+
+  <!-- Tabla de abastecimientos -->
+   <div class="table-container my-4">
+  <div class="table-responsive">
+  <table class="table table-striped table-hover">
+    <thead class="table-dark">
+      <tr>
+        <th>Proveedor</th>
+        <th>Producto</th>
+        <th>Precio de Compra</th>
+        <th>Acciones</th>
+      </tr>
+    </thead>
+    <tbody id="tabla-abastecimientos"></tbody>
+  </table>
+
+<!-- Paginación -->
+  <nav aria-label="Page navigation">
+    <ul class="pagination justify-content-center" id="paginacion-abastecimientos"></ul>
+  </nav>
+
+  <a href="{{ url_for('menu') }}" class="btn btn-secondary mt-3">Volver al Inicio</a>
+
+
+  </div>
+  </div>
+
+
+
+  <!-- Modal para registrar o editar abastecimiento -->
+  <div class="modal fade" id="modalAbastecimiento" tabindex="-1" aria-hidden="true">
+    <div class="modal-dialog">
+      <div class="modal-content">
+        <form id="form-abastecimiento">
+          <div class="modal-header">
+            <h5 class="modal-title">Formulario de Abastecimiento</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+          </div>
+          <div class="modal-body row g-2">
+            <div class="col-md-12">
+              <label for="cod_prv" class="form-label">Proveedor</label>
+              <select id="cod_prv" class="form-select" required>
+                <option value="">Seleccione Proveedor</option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <label for="cod_pro" class="form-label">Producto</label>
+              <select id="cod_pro" class="form-select" required>
+                <option value="">Seleccione Producto</option>
+              </select>
+            </div>
+            <div class="col-md-12">
+              <label for="pre_com" class="form-label">Precio de Compra</label>
+              <input type="number" id="pre_com" class="form-control" step="0.01" min="0" required />
+            </div>
+          </div>
+          <div class="modal-footer">
+            <button type="submit" class="btn btn-primary" id="btnGuardar">Guardar</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancelar</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let abastecimientoEditando = null;
+    let paginaActual = 1;
+    const porPagina = 10; // Número de elementos por página
+
+    // Cargar datos iniciales
+    document.addEventListener("DOMContentLoaded", () => {
+      cargarAbastecimientos(paginaActual);
+    });
+
+    // Función para cargar la lista de abastecimientos con paginación
+    function cargarAbastecimientos(pagina = 1) {
+      fetch(`/api/abastecimientos?pagina=${pagina}&por_pagina=${porPagina}`)
+        .then(res => res.json())
+        .then(data => {
+          renderizarAbastecimientos(data.abastecimientos);
+          actualizarPaginacion(pagina, data.total_paginas);
+          paginaActual = pagina;
+        })
+        .catch(console.error);
+    }
+
+    // Función para actualizar la paginación
+    function actualizarPaginacion(pagina, totalPaginas) {
+      const paginacion = document.getElementById("paginacion-abastecimientos");
+      paginacion.innerHTML = "";
+      
+      // Botón Anterior
+      if (pagina > 1) {
+        const anterior = document.createElement("li");
+        anterior.className = "page-item";
+        anterior.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+        anterior.onclick = (e) => { 
+          e.preventDefault(); 
+          cargarAbastecimientos(pagina - 1); 
+        };
+        paginacion.appendChild(anterior);
+      }
+      
+      // Números de página
+      for (let i = 1; i <= totalPaginas; i++) {
+        const li = document.createElement("li");
+        li.className = `page-item ${i === pagina ? "active" : ""}`;
+        li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+        li.onclick = (e) => { 
+          e.preventDefault(); 
+          cargarAbastecimientos(i); 
+        };
+        paginacion.appendChild(li);
+      }
+      
+      // Botón Siguiente
+      if (pagina < totalPaginas) {
+        const siguiente = document.createElement("li");
+        siguiente.className = "page-item";
+        siguiente.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+        siguiente.onclick = (e) => { 
+          e.preventDefault(); 
+          cargarAbastecimientos(pagina + 1); 
+        };
+        paginacion.appendChild(siguiente);
+      }
+    }
+
+    // Función para cargar proveedores en el select
+    function cargarProveedores() {
+      fetch("/api/proveedores?pagina=1&por_pagina=1000")
+        .then(res => res.json())
+        .then(data => {
+          const select = document.getElementById("cod_prv");
+          select.innerHTML = '<option value="">Seleccione Proveedor</option>';
+          data.proveedores.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.COD_PRV;
+            opt.textContent = `${p.COD_PRV} - ${p.RSO_PRV}`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // Función para cargar productos en el select
+    function cargarProductos() {
+      fetch("/api/productos/lista")
+        .then(res => res.json())
+        .then(data => {
+          const select = document.getElementById("cod_pro");
+          select.innerHTML = '<option value="">Seleccione Producto</option>';
+          data.forEach(p => {
+            const opt = document.createElement("option");
+            opt.value = p.COD_PRO;
+            opt.textContent = `${p.COD_PRO} - ${p.DES_PRO}`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // Función para renderizar la tabla de abastecimientos
+    function renderizarAbastecimientos(abastecimientos) {
+      const tbody = document.getElementById("tabla-abastecimientos");
+      tbody.innerHTML = "";
+      
+      abastecimientos.forEach(a => {
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+          <td>${a.RSO_PRV}</td>
+          <td>${a.DES_PRO}</td>
+          <td>S/ ${parseFloat(a.PRE_ABA).toFixed(2)}</td>
+          <td>
+            <button class="btn btn-warning btn-sm me-1" onclick="prepararEdicion('${a.COD_PRV}', '${a.COD_PRO}')">Editar</button>
+            <button class="btn btn-danger btn-sm" onclick="eliminarAbastecimiento('${a.COD_PRV}', '${a.COD_PRO}')">Eliminar</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    // Función para preparar el formulario para edición
+function prepararEdicion(cod_prv, cod_pro) {
+  fetch(`/api/abastecimientos?cod_prv=${cod_prv}&cod_pro=${cod_pro}`)
+    .then(res => res.json())
+    .then(data => {
+      if (data.abastecimientos && data.abastecimientos.length > 0) {
+        const abastecimiento = data.abastecimientos[0];
+        abastecimientoEditando = {
+          COD_PRV: abastecimiento.COD_PRV,
+          COD_PRO: abastecimiento.COD_PRO
+        };
+        
+        document.getElementById("cod_prv").value = abastecimiento.COD_PRV;
+        document.getElementById("cod_pro").value = abastecimiento.COD_PRO;
+        document.getElementById("pre_com").value = abastecimiento.PRE_ABA;
+        
+        // Quitamos el disabled para permitir modificar proveedor y producto
+        document.getElementById("cod_prv").disabled = false;
+        document.getElementById("cod_pro").disabled = false;
+        
+        new bootstrap.Modal(document.getElementById('modalAbastecimiento')).show();
+      }
+    })
+    .catch(console.error);
+}
+
+
+    // Función para eliminar un abastecimiento
+    function eliminarAbastecimiento(cod_prv, cod_pro) {
+      if (confirm("¿Está seguro de eliminar este abastecimiento?")) {
+        fetch("/api/abastecimientos", {
+          method: "DELETE",
+          headers: {
+            "Content-Type": "application/json"
+          },
+          body: JSON.stringify({
+            COD_PRV: cod_prv,
+            COD_PRO: cod_pro
+          })
+        })
+        .then(res => res.json())
+        .then(data => {
+          if (data.success) {
+            cargarAbastecimientos(paginaActual);
+          } else {
+            alert("Error al eliminar el abastecimiento");
+          }
+        })
+        .catch(console.error);
+      }
+    }
+
+    // Manejar el envío del formulario
+document.getElementById("form-abastecimiento").addEventListener("submit", function(e) {
+  e.preventDefault();
+  
+  const cod_prv = document.getElementById("cod_prv").value;
+  const cod_pro = document.getElementById("cod_pro").value;
+  const pre_com = document.getElementById("pre_com").value;
+  
+  const method = abastecimientoEditando ? "PUT" : "POST";
+  const url = "/api/abastecimientos";
+  
+  const bodyData = {
+    COD_PRV: cod_prv,
+    COD_PRO: cod_pro,
+    PRE_ABA: pre_com
+  };
+  
+  // Si estamos editando, agregamos los códigos originales para identificación
+  if (abastecimientoEditando) {
+    bodyData.original_COD_PRV = abastecimientoEditando.COD_PRV;
+    bodyData.original_COD_PRO = abastecimientoEditando.COD_PRO;
+  }
+  
+  fetch(url, {
+    method: method,
+    headers: {
+      "Content-Type": "application/json"
+    },
+    body: JSON.stringify(bodyData)
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success) {
+      bootstrap.Modal.getInstance(document.getElementById('modalAbastecimiento')).hide();
+      cargarAbastecimientos(paginaActual);
+      resetForm();
+    } else {
+      alert(data.error || "Error al guardar el abastecimiento");
+    }
+  })
+  .catch(error => {
+    console.error(error);
+    alert("Error en la comunicación con el servidor");
+  });
+});
+
+    // Resetear el formulario cuando se cierra el modal
+    document.getElementById('modalAbastecimiento').addEventListener('hidden.bs.modal', resetForm);
+
+    // Función para resetear el formulario
+    function resetForm() {
+      document.getElementById("form-abastecimiento").reset();
+      document.getElementById("cod_prv").disabled = false;
+      document.getElementById("cod_pro").disabled = false;
+      abastecimientoEditando = null;
+    }
+
+    // Cargar proveedores y productos cuando se abre el modal
+    document.getElementById('modalAbastecimiento').addEventListener('show.bs.modal', () => {
+      cargarProveedores();
+      cargarProductos();
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,464 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Gestión de Clientes</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" />
+
+<!-- Fuente moderna -->
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
+
+<style>
+  body {
+    font-family: 'Poppins', sans-serif;
+    background: linear-gradient(to right, #fdfbfb, #ebedee);
+    color: #333;
+    transition: background 0.5s ease;
+  }
+
+  h2 {
+    font-weight: 600;
+    color: #1f3a93;
+    margin-bottom: 0;
+    transition: color 0.3s;
+  }
+
+  .btn-success {
+    background: linear-gradient(135deg, #16a085, #1abc9c);
+    border: none;
+    font-weight: 500;
+    box-shadow: 0 4px 10px rgba(22, 160, 133, 0.4);
+    transition: all 0.3s ease;
+  }
+
+  .btn-success:hover {
+    transform: scale(1.05);
+    background: #148f77;
+  }
+
+  .btn-secondary {
+    background-color: #7f8c8d;
+    border: none;
+    font-weight: 500;
+    transition: background 0.3s;
+  }
+
+  .btn-secondary:hover {
+    background-color: #5d6d70;
+  }
+
+  .table-container {
+    background: #ffffff;
+    padding: 2rem;
+    border-radius: 1rem;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.08);
+    animation: fadeInUp 0.8s ease forwards;
+  }
+
+  .table {
+    border-radius: 0.5rem;
+    overflow: hidden;
+  }
+
+  .table th {
+    background: #2c3e50;
+    color: #ffffff;
+    font-weight: 500;
+    border: none;
+  }
+
+  .table-hover tbody tr:hover {
+    background-color: #f6f9fc;
+    transition: background 0.3s;
+  }
+
+  .modal-content {
+    border-radius: 1rem;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    animation: fadeIn 0.5s ease forwards;
+  }
+
+  .modal-header {
+    background: linear-gradient(135deg, #1f3a93, #2980b9);
+    color: white;
+    border-top-left-radius: 1rem;
+    border-top-right-radius: 1rem;
+  }
+
+  .form-label {
+    font-weight: 500;
+    color: #34495e;
+  }
+
+  .form-control, .form-select {
+    border-radius: 0.5rem;
+    border: 1px solid #ced4da;
+    transition: all 0.3s;
+  }
+
+  .form-control:focus, .form-select:focus {
+    border-color: #f39c12;
+    box-shadow: 0 0 0 0.25rem rgba(243, 156, 18, 0.2);
+  }
+
+  .btn-primary {
+    background: linear-gradient(to right, #f39c12, #f1c40f);
+    border: none;
+    font-weight: 500;
+    transition: all 0.3s ease;
+  }
+
+  .btn-primary:hover {
+    background: #e67e22;
+    transform: scale(1.03);
+  }
+
+  .pagination .page-link {
+    color: #2c3e50;
+    border-radius: 0.5rem;
+    transition: background 0.3s;
+  }
+
+  .pagination .page-link:hover {
+    background-color: #ecf0f1;
+  }
+
+  small.form-text {
+    font-size: 0.75rem;
+    color: #7f8c8d;
+  }
+
+  .bi {
+    vertical-align: -0.125em;
+    margin-right: 0.3rem;
+  }
+
+  /* Animaciones */
+  @keyframes fadeInUp {
+    from { opacity: 0; transform: translateY(40px); }
+    to { opacity: 1; transform: translateY(0); }
+  }
+
+  @keyframes fadeIn {
+    from { opacity: 0; transform: scale(0.95); }
+    to { opacity: 1; transform: scale(1); }
+  }
+</style>
+
+
+
+</head>
+<body class="container py-4">
+
+  <div class="d-flex justify-content-between align-items-center mb-4">
+    <h2 class="mb-0">
+  <i class="bi bi-people-fill me-2"></i> Gestión de Clientes
+</h2>
+
+    <button class="btn btn-success" data-bs-toggle="modal" data-bs-target="#modalCliente">
+      <i class="bi bi-plus-circle"></i> Crear Cliente
+    </button>
+  </div>
+
+<div class="table-container my-4">
+  <div class="table-responsive">
+    <table class="table table-bordered table-hover align-middle text-center">
+      <thead class="table-dark">
+        <tr>
+          <th>Código</th>
+          <th>Razón Social</th>
+          <th>Dirección</th>
+          <th>Teléfono</th>
+          <th>RUC</th>
+          <th>Distrito</th>
+          <th>Fecha Registro</th>
+          <th>Tipo</th>
+          <th>Contacto</th>
+          <th>Acciones</th>
+        </tr>
+      </thead>
+      <tbody id="tabla-clientes"></tbody>
+    </table>
+
+     <nav class="d-flex justify-content-center my-3">
+    <ul class="pagination" id="paginacion-clientes"></ul>
+  </nav>
+
+  <a href="{{ url_for('menu') }}" class="btn btn-outline-secondary mt-3">
+  <i class="bi bi-arrow-bar-left me-1"></i> Regresar al Menú Principal
+</a>
+
+  </div>
+    </div>
+
+ 
+
+
+  <div class="modal fade" id="modalCliente" tabindex="-1" aria-hidden="true">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+      <form id="form-cliente">
+        <div class="modal-header bg-primary text-white">
+          <h5 class="modal-title">Formulario de Cliente</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <div class="row g-3">
+            <div class="col-md-2">
+              <label for="cod_cli" class="form-label">Código</label>
+              <input type="text" id="cod_cli" class="form-control" maxlength="5" 
+                     pattern="^C\d{3}$" title="Formato: C seguido de 3 dígitos (ej. C001)" required />
+              <small class="form-text text-muted">Ejemplo: C001</small>
+            </div>
+            
+            <div class="col-md-4">
+              <label for="rso_cli" class="form-label">Razón Social</label>
+              <input type="text" id="rso_cli" class="form-control" maxlength="30" 
+                     pattern="[A-Za-zÁ-ú\s]+" title="Solo letras y espacios" required />
+              <small class="form-text text-muted">Ejemplo: FINSETH</small>
+            </div>
+            
+            <div class="col-md-6">
+              <label for="dir_cli" class="form-label">Dirección</label>
+              <input type="text" id="dir_cli" class="form-control" maxlength="100" required />
+              <small class="form-text text-muted">Ejemplo: AV. LOS VIÑEDOS 150</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="tlf_cli" class="form-label">Teléfono</label>
+              <input type="tel" id="tlf_cli" class="form-control" maxlength="9" 
+                     pattern="\d{7,9}" title="7 a 9 dígitos numéricos" required />
+              <small class="form-text text-muted">Ejemplo: 4342318</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="ruc_cli" class="form-label">RUC</label>
+              <input type="text" id="ruc_cli" class="form-control" maxlength="11" 
+                     pattern="\d{8,11}|^$" title="8 a 11 dígitos o vacío" />
+              <small class="form-text text-muted">Ejemplo: 48632081 (opcional)</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="cod_dis" class="form-label">Distrito</label>
+              <select id="cod_dis" class="form-select" required>
+              </select>
+              <small class="form-text text-muted">Ejemplo: D05</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="fec_reg" class="form-label">Fecha Registro</label>
+              <input type="date" id="fec_reg" class="form-control" required />
+              <small class="form-text text-muted">Ejemplo: 2008-10-12</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="tip_cli" class="form-label">Tipo</label>
+              <select id="tip_cli" class="form-select" required>
+                <option value="">Seleccione Tipo</option>
+                <option value="1">NATURAL</option>
+                <option value="2">JURIDICO</option>
+              </select>
+              <small class="form-text text-muted">Ejemplo: NATURAL</small>
+            </div>
+            
+            <div class="col-md-3">
+              <label for="con_cli" class="form-label">Contacto</label>
+              <input type="text" id="con_cli" class="form-control" maxlength="30" 
+                     pattern="[A-Za-zÁ-ú\s]+" title="Solo letras y espacios" required />
+              <small class="form-text text-muted">Ejemplo: ALICIA BARRETO</small>
+            </div>
+          </div>
+        </div>
+        <div class="modal-footer">
+          <button type="submit" class="btn btn-primary">
+            <i class="bi bi-save"></i> Guardar
+          </button>
+          <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+            Cancelar
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+</div>
+
+  <!-- JS -->
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+  <script>
+    let paginaCliente = 1;
+    const porPagina = 5;
+    let editando = false;
+
+    // Formatea fecha YYYY-MM-DDTHH:MM:SS a DD/MM/YYYY
+    function formatearFecha(fechaStr) {
+      const fecha = new Date(fechaStr);
+      const dia = String(fecha.getDate()).padStart(2, '0');
+      const mes = String(fecha.getMonth() + 1).padStart(2, '0');
+      const año = fecha.getFullYear();
+      return `${dia}/${mes}/${año}`;
+    }
+
+    // Carga clientes
+    function cargarClientes(pagina = 1) {
+      fetch(`/api/clientes?pagina=${pagina}&por_pagina=${porPagina}`)
+        .then(res => res.json())
+        .then(data => {
+          const tbody = document.getElementById("tabla-clientes");
+          const paginacion = document.getElementById("paginacion-clientes");
+          tbody.innerHTML = "";
+          data.clientes.forEach(c => {
+            tbody.innerHTML += `
+              <tr>
+                <td>${c.COD_CLI}</td>
+                <td>${c.RSO_CLI}</td>
+                <td>${c.DIR_CLI}</td>
+                <td>${c.TLF_CLI}</td>
+                <td>${c.RUC_CLI}</td>
+                <td>${c.COD_DIS}</td>
+                <td>${formatearFecha(c.FEC_REG)}</td>
+                <td>${c.TIP_CLI}</td>
+                <td>${c.CON_CLI}</td>
+                <td>
+                  <button class="btn btn-warning btn-sm me-1" onclick='editarCliente(${JSON.stringify(c)})'>Editar</button>
+                  <button class="btn btn-danger btn-sm" onclick='eliminarCliente("${c.COD_CLI}")'>Eliminar</button>
+                </td>
+              </tr>
+            `;
+          });
+          
+          // Paginación modificada para que sea como en productos
+          paginacion.innerHTML = "";
+          
+          // Botón Anterior
+          if (pagina > 1) {
+            const anterior = document.createElement("li");
+            anterior.className = "page-item";
+            anterior.innerHTML = `<a class="page-link" href="#">Anterior</a>`;
+            anterior.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarClientes(pagina - 1); 
+            };
+            paginacion.appendChild(anterior);
+          }
+          
+          // Números de página
+          for (let i = 1; i <= data.total_paginas; i++) {
+            const li = document.createElement("li");
+            li.className = `page-item ${i === pagina ? "active" : ""}`;
+            li.innerHTML = `<a class="page-link" href="#">${i}</a>`;
+            li.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarClientes(i); 
+            };
+            paginacion.appendChild(li);
+          }
+          
+          // Botón Siguiente
+          if (pagina < data.total_paginas) {
+            const siguiente = document.createElement("li");
+            siguiente.className = "page-item";
+            siguiente.innerHTML = `<a class="page-link" href="#">Siguiente</a>`;
+            siguiente.onclick = (e) => { 
+              e.preventDefault(); 
+              cargarClientes(pagina + 1); 
+            };
+            paginacion.appendChild(siguiente);
+          }
+          
+          paginaCliente = pagina;
+        });
+    }
+
+    function crearLi(pag, text) {
+      const li = document.createElement("li");
+      li.className = `page-item ${pag === paginaCliente ? 'active' : ''}`;
+      li.innerHTML = `<a class="page-link" href="#">${text}</a>`;
+      li.onclick = e => { e.preventDefault(); cargarClientes(pag); };
+      return li;
+    }
+
+    // Carga distritos al abrir el modal
+    function cargarDistritos() {
+      fetch("/api/distritos?pagina=1&por_pagina=1000")
+        .then(res => res.json())
+        .then(data => {
+          const select = document.getElementById("cod_dis");
+          select.innerHTML = '<option value="">Seleccione Distrito</option>';
+          data.distritos.forEach(d => {
+            const opt = document.createElement("option");
+            opt.value = d.COD_DIS;
+            opt.textContent = `${d.COD_DIS} - ${d.NOM_DIS}`;
+            select.appendChild(opt);
+          });
+        })
+        .catch(console.error);
+    }
+
+    // Cuando el modal se muestre, recarga los distritos
+    const modalEl = document.getElementById('modalCliente');
+    modalEl.addEventListener('show.bs.modal', () => {
+      cargarDistritos();
+      if (!editando) document.getElementById('form-cliente').reset();
+    });
+
+    // Envío formulario
+    document.getElementById("form-cliente").addEventListener("submit", e => {
+      e.preventDefault();
+      const data = {
+        COD_CLI: document.getElementById("cod_cli").value,
+        RSO_CLI: document.getElementById("rso_cli").value,
+        DIR_CLI: document.getElementById("dir_cli").value,
+        TLF_CLI: document.getElementById("tlf_cli").value,
+        RUC_CLI: document.getElementById("ruc_cli").value,
+        COD_DIS: document.getElementById("cod_dis").value,
+        FEC_REG: document.getElementById("fec_reg").value,
+        TIP_CLI: document.getElementById("tip_cli").value,
+        CON_CLI: document.getElementById("con_cli").value
+      };
+      fetch("/api/clientes", {
+        method: editando ? "PUT" : "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(data)
+      })
+      .then(res => res.json())
+      .then(resp => {
+        if (resp.success) {
+          alert(editando ? "Cliente actualizado." : "Cliente registrado.");
+          cargarClientes(paginaCliente);
+          bootstrap.Modal.getInstance(modalEl).hide();
+          editando = false;
+        } else alert("Error: " + resp.error);
+      });
+    });
+
+    function editarCliente(c) {
+      editando = true;
+      for (let key in c) {
+        const el = document.getElementById(key.toLowerCase());
+        if (el) el.value = c[key];
+      }
+      new bootstrap.Modal(modalEl).show();
+    }
+
+    function eliminarCliente(cod) {
+      if (confirm("¿Eliminar cliente?")) {
+        fetch("/api/clientes", {
+          method: "DELETE",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ COD_CLI: cod })
+        })
+        .then(res => res.json())
+        .then(resp => {
+          if (resp.success) cargarClientes(paginaCliente);
+          else alert("Error: " + resp.error);
+        });
+      }
+    }
+
+    // Carga inicial
+    window.addEventListener('DOMContentLoaded', () => {
+      cargarClientes();
+    });
+  </script>
+</body>
+</html>
